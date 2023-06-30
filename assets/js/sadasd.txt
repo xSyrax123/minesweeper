@@ -1,0 +1,399 @@
+totalCellsRevealed no cuenta correctamente la cantidad de celdas reveladas. ¿Qué falla?
+
+HTML:
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Minesweeper</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="assets/css/normalize.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" href="assets/img/favicon.png">
+    <script src="assets/js/index.js" defer></script>
+  </head>
+  <body>
+    <h1>Minesweeper</h1>
+
+    <section class="minesweeper">
+      <div class="level">
+        <button class="btn active" id="beginner">Beginner</button>
+        <button class="btn" id="intermediate">Intermediate</button>
+        <button class="btn" id="advanced">Advanced</button>
+        <button class="btn" id="new-game">New game</button>
+      </div>
+
+      <p class="info">🚩 <span id="remaining-flags">10</span></p>
+
+      <table id="board"></table>
+    </section>
+  </body>
+</html>
+
+CSS:body {
+  background-color: #55ddff;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  color: #263be8;
+}
+
+.minesweeper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn {
+  background-color: #0000ff;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  line-height: normal;
+  border-radius: 5px;
+  padding: 5px;
+  margin-left: 8px;
+}
+
+.active {
+  background-color: red;
+}
+
+.info {
+  color: red;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+table {
+  border-spacing: 0px;
+}
+
+td {
+  padding: 0;
+  width: 25px;
+  height: 25px;
+  background-color: #fff;
+  border: 1px solid #a1a1a1;
+  text-align: center;
+  line-height: 20px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.mine {
+  background: #eeeeee url(../img/mine.png) no-repeat center;
+  background-size: cover;
+}
+
+.flag {
+  background: #eeeeee url(../img/flag.png) no-repeat center;
+  background-size: cover;
+}
+
+.zero {
+  background-color: #eeeeee;
+}
+
+.one {
+  background-color: #eeeeee;
+  color: #0332fe;
+}
+
+.two {
+  background-color: #eeeeee;
+  color: #019f02;
+}
+
+.three {
+  background-color: #eeeeee;
+  color: #ff2600;
+}
+
+.four {
+  background-color: #eeeeee;
+  color: #93208f;
+}
+
+.five {
+  background-color: #eeeeee;
+  color: #ff7f29;
+}
+
+.six {
+  background-color: #eeeeee;
+  color: #ff3fff;
+}
+
+.seven {
+  background-color: #eeeeee;
+  color: #53b8b4;
+}
+
+.eight {
+  background-color: #eeeeee;
+  color: #22ee0f;
+}
+
+
+JavaScript:
+const BOARD = document.getElementById("board");
+const REMAINING_FLAGS_ELEMENT = document.getElementById("remaining-flags");
+const NEW_GAME_BUTTON = document.getElementById("new-game");
+const LEVEL_BUTTONS = {
+  beginner: document.getElementById("beginner"),
+  intermediate: document.getElementById("intermediate"),
+  advanced: document.getElementById("advanced"),
+};
+const LEVEL_SETTINGS = {
+  beginner: { rows: 9, cols: 9, mines: 10 },
+  intermediate: { rows: 16, cols: 16, mines: 40 },
+  advanced: { rows: 16, cols: 30, mines: 99 },
+};
+
+let currentLevel = "beginner";
+let remainingMines = LEVEL_SETTINGS[currentLevel].mines;
+let remainingFlags = remainingMines;
+let boardArray = [];
+let gameOver;
+let totalCellsRevealed = 0;
+let correctFlagsCount = 0;
+
+function createBoard() {
+  const CURRENT_LEVEL_CONFIG = LEVEL_SETTINGS[currentLevel];
+  const ROWS = CURRENT_LEVEL_CONFIG.rows;
+  const COLUMNS = CURRENT_LEVEL_CONFIG.cols;
+  const BOARD_FRAGMENT = document.createDocumentFragment();
+
+  BOARD.textContent = "";
+  totalCellsRevealed = 0;
+  correctFlagsCount = 0;
+
+  for (let i = 0; i < ROWS; i++) {
+    const ROW = document.createElement("tr");
+    boardArray[i] = [];
+
+    for (let j = 0; j < COLUMNS; j++) {
+      const CELL = document.createElement("td");
+      boardArray[i][j] = 0;
+      ROW.appendChild(CELL);
+    }
+
+    BOARD_FRAGMENT.appendChild(ROW);
+  }
+
+  BOARD.appendChild(BOARD_FRAGMENT);
+
+  REMAINING_FLAGS_ELEMENT.textContent = remainingFlags;
+
+  placeMinesRandomly(remainingMines, ROWS, COLUMNS);
+  countAdjacentMines(ROWS, COLUMNS);
+}
+
+function placeMinesRandomly(remainingMines, ROWS, COLUMNS) {
+  const TOTAL_CELLS = ROWS * COLUMNS;
+
+  let minesToPlace = remainingMines;
+
+  for (let i = 0; i < TOTAL_CELLS; i++) {
+    const RANDOM_INDEX = Math.floor(Math.random() * (TOTAL_CELLS - i)) + i;
+    const RANDOM_ROW = Math.floor(RANDOM_INDEX / COLUMNS);
+    const RANDOM_COL = RANDOM_INDEX % COLUMNS;
+
+    if (boardArray[RANDOM_ROW][RANDOM_COL] !== "mine") {
+      boardArray[RANDOM_ROW][RANDOM_COL] = "mine";
+      minesToPlace--;
+
+      if (!minesToPlace) break;
+    }
+  }
+}
+
+function countAdjacentMines(ROWS, COLUMNS) {
+  for (let row = 0; row < ROWS; row++) {
+    for (let col = 0; col < COLUMNS; col++) {
+      if (boardArray[row][col] === "mine") continue;
+
+      let minesCount = 0;
+
+      for (
+        let i = Math.max(0, row - 1);
+        i <= Math.min(row + 1, ROWS - 1);
+        i++
+      ) {
+        for (
+          let j = Math.max(0, col - 1);
+          j <= Math.min(col + 1, COLUMNS - 1);
+          j++
+        ) {
+          if (boardArray[i][j] === "mine") minesCount++;
+        }
+      }
+
+      boardArray[row][col] = minesCount;
+    }
+  }
+}
+
+function revealCell(row, col) {
+  const CURRENT_LEVEL_CONFIG = LEVEL_SETTINGS[currentLevel];
+  const ROWS = CURRENT_LEVEL_CONFIG.rows;
+  const COLUMNS = CURRENT_LEVEL_CONFIG.cols;
+  const CELL = BOARD.rows[row].cells[col];
+  
+  if (CELL.classList.contains("flag") || gameOver) return;
+
+  if (boardArray[row][col] === "mine") {
+    gameOver = true;
+    revealAllMines(ROWS, COLUMNS);
+    alert("Game over! You hit a mine.");
+  } else if (boardArray[row][col] === 0) {
+    revealEmptyCells(row, col);
+  } else {
+    const NUMBER_CLASS = getNumberClass(boardArray[row][col]);
+    CELL.textContent = boardArray[row][col];
+    CELL.classList.add(NUMBER_CLASS);
+    totalCellsRevealed++;
+    console.log(totalCellsRevealed);
+  }
+
+}
+
+function revealAllMines(rows, columns) {
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < columns; j++) {
+      if (boardArray[i][j] === "mine") {
+        const MINE_CELL = BOARD.rows[i].cells[j];
+        MINE_CELL.classList.add("mine");
+      }
+    }
+  }
+}
+
+function revealEmptyCells(row, col) {
+  const cell = BOARD.rows[row].cells[col];
+
+  if (
+    cell.classList.contains("zero") ||
+    cell.classList.contains("flag") ||
+    cell.textContent !== ""
+  ) {
+    return;
+  }
+
+  cell.classList.add("zero");
+
+  for (
+    let i = Math.max(0, row - 1);
+    i <= Math.min(row + 1, BOARD.rows.length - 1);
+    i++
+  ) {
+    for (
+      let j = Math.max(0, col - 1);
+      j <= Math.min(col + 1, BOARD.rows[i].cells.length - 1);
+      j++
+    ) {
+      revealCell(i, j);
+    }
+  }
+}
+
+function getNumberClass(number) {
+  switch (number) {
+    case 1:
+      return "one";
+    case 2:
+      return "two";
+    case 3:
+      return "three";
+    case 4:
+      return "four";
+    case 5:
+      return "five";
+    case 6:
+      return "six";
+    case 7:
+      return "seven";
+    case 8:
+      return "eight";
+    default:
+      return "";
+  }
+}
+
+function changeLevel(level) {
+  if (currentLevel === level) return;
+
+  LEVEL_BUTTONS[currentLevel].classList.remove("active");
+  currentLevel = level;
+  LEVEL_BUTTONS[currentLevel].classList.add("active");
+
+  remainingMines = LEVEL_SETTINGS[currentLevel].mines;
+  remainingFlags = remainingMines;
+  REMAINING_FLAGS_ELEMENT.textContent = remainingFlags;
+
+  createBoard();
+}
+
+function addFlagToCell(cell) {
+  if (cell.classList.contains("zero") || cell.textContent !== "" || gameOver) {
+    return;
+  }
+
+  const HAS_FLAG = cell.classList.contains("flag");
+  cell.classList.toggle("flag", !HAS_FLAG);
+  remainingFlags += HAS_FLAG ? 1 : -1;
+  REMAINING_FLAGS_ELEMENT.textContent = remainingFlags;
+}
+
+function newGame() {
+  const CELLS = document.querySelectorAll("td");
+
+  CELLS.forEach((cell) => {
+    cell.textContent = "";
+    cell.className = "";
+  });
+
+  remainingMines = LEVEL_SETTINGS[currentLevel].mines;
+  remainingFlags = remainingMines;
+  gameOver = false;
+  REMAINING_FLAGS_ELEMENT.textContent = remainingFlags;
+}
+
+function checkWin() {
+  
+}
+
+document.addEventListener("click", (event) => {
+  const TARGET = event.target;
+
+  if (TARGET.tagName === "TD") {
+    const ROW = TARGET.parentNode.rowIndex;
+    const COL = TARGET.cellIndex;
+    revealCell(ROW, COL);
+  } else if (TARGET === LEVEL_BUTTONS["beginner"]) {
+    changeLevel("beginner");
+  } else if (TARGET === LEVEL_BUTTONS["intermediate"]) {
+    changeLevel("intermediate");
+  } else if (TARGET === LEVEL_BUTTONS["advanced"]) {
+    changeLevel("advanced");
+  } else if (TARGET === NEW_GAME_BUTTON) {
+    newGame();
+  }
+});
+
+document.addEventListener("contextmenu", (event) => {
+  const TARGET = event.target;
+
+  if (TARGET.tagName === "TD") {
+    event.preventDefault();
+    addFlagToCell(TARGET);
+  }
+});
+
+createBoard();

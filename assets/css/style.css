@@ -1,0 +1,109 @@
+body {
+  background-color: #55ddff;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  text-align: center;
+  color: #263be8;
+}
+
+.minesweeper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn {
+  background-color: #0000ff;
+  border: 0;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  line-height: normal;
+  border-radius: 5px;
+  padding: 5px;
+  margin-left: 8px;
+}
+
+.active {
+  background-color: red;
+}
+
+.info {
+  color: red;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+table {
+  border-spacing: 0px;
+}
+
+td {
+  padding: 0;
+  width: 25px;
+  height: 25px;
+  background-color: #fff;
+  border: 1px solid #a1a1a1;
+  text-align: center;
+  line-height: 20px;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.mine {
+  background: #eeeeee url(../img/mine.png) no-repeat center;
+  background-size: cover;
+}
+
+.flag {
+  background: #eeeeee url(../img/flag.png) no-repeat center;
+  background-size: cover;
+}
+
+.zero {
+  background-color: #eeeeee;
+}
+
+.one {
+  background-color: #eeeeee;
+  color: #0332fe;
+}
+
+.two {
+  background-color: #eeeeee;
+  color: #019f02;
+}
+
+.three {
+  background-color: #eeeeee;
+  color: #ff2600;
+}
+
+.four {
+  background-color: #eeeeee;
+  color: #93208f;
+}
+
+.five {
+  background-color: #eeeeee;
+  color: #ff7f29;
+}
+
+.six {
+  background-color: #eeeeee;
+  color: #ff3fff;
+}
+
+.seven {
+  background-color: #eeeeee;
+  color: #53b8b4;
+}
+
+.eight {
+  background-color: #eeeeee;
+  color: #22ee0f;
+}
