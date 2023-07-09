@@ -117,7 +117,7 @@ function revealCell(row, col) {
     revealMines();
     alert("Game over! You hit a mine.");
   } else if (boardArray[row][col] === 0) {
-    revealEmptyCells(row, col);
+    revealAdjacentsCells(row, col);
   } else {
     const NUMBER_CLASS = getNumberClass(boardArray[row][col]);
     CELL.textContent = boardArray[row][col];
@@ -134,12 +134,12 @@ function revealCell(row, col) {
 }
 
 /**
- * Reveals empty cells surrounding the specified cell.
+ * Reveals adjacents cells surrounding the specified cell.
  *
  * @param {number} row - The row index of the cell.
  * @param {number} col - The column index of the cell.
  */
-function revealEmptyCells(row, col) {
+function revealAdjacentsCells(row, col) {
   const CELL = BOARD.rows[row].cells[col];
 
   if (CELL.textContent) return;
