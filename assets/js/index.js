@@ -13,26 +13,33 @@ const LEVEL_SETTINGS = {
 };
 
 let currentLevel = "beginner";
+let currentLevelConfig = LEVEL_SETTINGS[currentLevel];
+let rows = currentLevelConfig.rows;
+let columns = currentLevelConfig.cols;
 let remainingMines = LEVEL_SETTINGS[currentLevel].mines;
 let remainingFlags = remainingMines;
-let boardArray = [];
-let gameOver;
 let totalCellsRevealed = 0;
 let correctFlagsCount = 0;
+let boardArray = [];
+let gameFinish;
 
+/**
+ * Creates the game board by generating the HTML table structure.
+ * Initializes the game board array.
+ * Updates the remaining flags count displayed on the webpage.
+ * Places the mines randomly on the board.
+ * Counts the number of adjacent mines for each cell.
+ */
 function createBoard() {
-  const CURRENT_LEVEL_CONFIG = LEVEL_SETTINGS[currentLevel];
-  const ROWS = CURRENT_LEVEL_CONFIG.rows;
-  const COLUMNS = CURRENT_LEVEL_CONFIG.cols;
   const BOARD_FRAGMENT = document.createDocumentFragment();
 
   BOARD.textContent = "";
 
-  for (let i = 0; i < ROWS; i++) {
+  for (let i = 0; i < rows; i++) {
     const ROW = document.createElement("tr");
     boardArray[i] = [];
 
-    for (let j = 0; j < COLUMNS; j++) {
+    for (let j = 0; j < columns; j++) {
       const CELL = document.createElement("td");
       boardArray[i][j] = 0;
       ROW.appendChild(CELL);
@@ -45,39 +52,42 @@ function createBoard() {
 
   REMAINING_FLAGS_ELEMENT.textContent = remainingFlags;
 
-  placeMinesRandomly(remainingMines, ROWS, COLUMNS);
-  countAdjacentMines(ROWS, COLUMNS);
+  placeMines();
+  countAdjacentMines();
 }
 
-function placeMinesRandomly(remainingMines, ROWS, COLUMNS) {
-  const TOTAL_CELLS = ROWS * COLUMNS;
-
+/**
+ * Randomly places the mines on the game board.
+ * Updates the "boardArray" with the "mine" value for each mine location.
+ */
+function placeMines() {
   let minesToPlace = remainingMines;
 
-  for (let i = 0; i < TOTAL_CELLS; i++) {
-    const RANDOM_INDEX = Math.floor(Math.random() * (TOTAL_CELLS - i)) + i;
-    const RANDOM_ROW = Math.floor(RANDOM_INDEX / COLUMNS);
-    const RANDOM_COL = RANDOM_INDEX % COLUMNS;
+  while (minesToPlace > 0) {
+    const RANDOM_ROW = Math.floor(Math.random() * rows);
+    const RANDOM_COL = Math.floor(Math.random() * columns);
 
     if (boardArray[RANDOM_ROW][RANDOM_COL] !== "mine") {
       boardArray[RANDOM_ROW][RANDOM_COL] = "mine";
       minesToPlace--;
-
-      if (!minesToPlace) break;
     }
   }
 }
 
-function countAdjacentMines(ROWS, COLUMNS) {
-  for (let row = 0; row < ROWS; row++) {
-    for (let col = 0; col < COLUMNS; col++) {
+/**
+ * Counts the number of adjacent mines for each non-mine cell on the game board.
+ * Updates the "boardArray" with the corresponding mine count for each cell.
+ */
+function countAdjacentMines() {
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < columns; col++) {
       if (boardArray[row][col] !== "mine") {
         let minesCount = 0;
 
         for (let i = row - 1; i <= row + 1; i++) {
           for (let j = col - 1; j <= col + 1; j++) {
-            const VALID_ROW = i >= 0 && i < ROWS;
-            const VALID_COL = j >= 0 && j < COLUMNS;
+            const VALID_ROW = i >= 0 && i < rows;
+            const VALID_COL = j >= 0 && j < columns;
 
             if (VALID_ROW && VALID_COL && boardArray[i][j] === "mine") {
               minesCount++;
@@ -91,18 +101,20 @@ function countAdjacentMines(ROWS, COLUMNS) {
   }
 }
 
+/**
+ * Reveals the content of a cell and handles game logic.
+ *
+ * @param {number} row - The row index of the cell.
+ * @param {number} col - The column index of the cell.
+ */
 function revealCell(row, col) {
-  const CURRENT_LEVEL_CONFIG = LEVEL_SETTINGS[currentLevel];
-  const ROWS = CURRENT_LEVEL_CONFIG.rows;
-  const COLUMNS = CURRENT_LEVEL_CONFIG.cols;
   const CELL = BOARD.rows[row].cells[col];
 
-  if (CELL.classList.contains("flag") || CELL.classList.value || gameOver)
-    return;
+  if (CELL.classList.contains("flag") || gameFinish) return;
 
   if (boardArray[row][col] === "mine") {
-    gameOver = true;
-    revealAllMines(ROWS, COLUMNS);
+    gameFinish = true;
+    revealMines();
     alert("Game over! You hit a mine.");
   } else if (boardArray[row][col] === 0) {
     revealEmptyCells(row, col);
@@ -114,14 +126,44 @@ function revealCell(row, col) {
 
   totalCellsRevealed++;
 
-  if (checkWin(ROWS, COLUMNS)) {
-    gameOver = true;
+  if (checkWin()) {
+    gameFinish = true;
     alert("You win!");
     return;
   }
 }
 
-function revealAllMines(rows, columns) {
+/**
+ * Reveals empty cells surrounding the specified cell.
+ *
+ * @param {number} row - The row index of the cell.
+ * @param {number} col - The column index of the cell.
+ */
+function revealEmptyCells(row, col) {
+  const CELL = BOARD.rows[row].cells[col];
+
+  if (CELL.textContent) return;
+
+  CELL.classList.add("zero");
+
+  for (let i = row - 1; i <= row + 1; i++) {
+    for (let j = col - 1; j <= col + 1; j++) {
+      const VALID_ROW = i >= 0 && i < rows;
+      const VALID_COL = j >= 0 && j < columns;
+
+      if (VALID_ROW && VALID_COL && !(i === row && j === col)) {
+        const CELL = BOARD.rows[i].cells[j];
+        if (!CELL.classList.value) revealCell(i, j);
+      }
+    }
+  }
+}
+
+/**
+ * Reveals all the mines on the game board.
+ * Adds the "mine" class to the HTML elements representing mine cells.
+ */
+function revealMines() {
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < columns; j++) {
       if (boardArray[i][j] === "mine") {
@@ -132,35 +174,12 @@ function revealAllMines(rows, columns) {
   }
 }
 
-function revealEmptyCells(row, col) {
-  const CURRENT_LEVEL_CONFIG = LEVEL_SETTINGS[currentLevel];
-  const ROWS = CURRENT_LEVEL_CONFIG.rows;
-  const COLUMNS = CURRENT_LEVEL_CONFIG.cols;
-  const CELL = BOARD.rows[row].cells[col];
-
-  if (
-    CELL.classList.contains("zero") ||
-    CELL.classList.contains("flag") ||
-    CELL.textContent !== ""
-  ) {
-    return;
-  }
-
-  CELL.classList.add("zero");
-
-  for (let i = Math.max(0, row - 1); i <= Math.min(row + 1, ROWS - 1); i++) {
-    for (
-      let j = Math.max(0, col - 1);
-      j <= Math.min(col + 1, COLUMNS - 1);
-      j++
-    ) {
-      if (i !== row || j !== col) {
-        revealCell(i, j);
-      }
-    }
-  }
-}
-
+/**
+ * Returns the CSS class name for a given number.
+ *
+ * @param {number} number - The number of adjacent mines.
+ * @returns {string} The CSS class name for the number.
+ */
 function getNumberClass(number) {
   switch (number) {
     case 1:
@@ -184,70 +203,79 @@ function getNumberClass(number) {
   }
 }
 
+/**
+ * Changes the game level to the specified level.
+ *
+ * @param {string} level - The level to change to.
+ */
 function changeLevel(level) {
   if (currentLevel === level) return;
 
-  gameOver = false;
+  gameFinish = false;
   LEVEL_BUTTONS[currentLevel].classList.remove("active");
   currentLevel = level;
   LEVEL_BUTTONS[currentLevel].classList.add("active");
 
-  remainingMines = LEVEL_SETTINGS[currentLevel].mines;
+  currentLevelConfig = LEVEL_SETTINGS[currentLevel];
+  rows = currentLevelConfig.rows;
+  columns = currentLevelConfig.cols;
+  remainingMines = currentLevelConfig.mines;
   remainingFlags = remainingMines;
   REMAINING_FLAGS_ELEMENT.textContent = remainingFlags;
 
   createBoard();
 }
 
+/**
+ * Toggles the flag on a cell when the player right-clicks on it.
+ *
+ * @param {HTMLElement} cell - The HTML element representing the cell.
+ */
 function addFlagToCell(cell) {
-  if (cell.classList.contains("zero") || cell.textContent !== "" || gameOver) {
-    return;
-  }
+  if (cell.classList.contains("zero") || cell.textContent || gameFinish) return;
 
   const HAS_FLAG = cell.classList.contains("flag");
   const ROW = cell.parentNode.rowIndex;
   const COL = cell.cellIndex;
-  const CURRENT_LEVEL_CONFIG = LEVEL_SETTINGS[currentLevel];
-  const ROWS = CURRENT_LEVEL_CONFIG.rows;
-  const COLUMNS = CURRENT_LEVEL_CONFIG.cols;
+
   cell.classList.toggle("flag", !HAS_FLAG);
   remainingFlags += HAS_FLAG ? 1 : -1;
   REMAINING_FLAGS_ELEMENT.textContent = remainingFlags;
 
-  if (!HAS_FLAG) {
-    if (boardArray[ROW][COL] === "mine") correctFlagsCount++;
-  }
+  if (!HAS_FLAG && boardArray[ROW][COL] === "mine") correctFlagsCount++;
 
-  if (checkWin(ROWS, COLUMNS)) {
-    gameOver = true;
+  if (checkWin()) {
+    gameFinish = true;
     alert("You win!");
     return;
   }
 }
 
-function newGame() {
-  const CELLS = document.querySelectorAll("td");
-
-  CELLS.forEach((cell) => {
-    cell.textContent = "";
-    cell.className = "";
-  });
-
-  correctFlagsCount = 0;
-  totalCellsRevealed = 0;
-  remainingMines = LEVEL_SETTINGS[currentLevel].mines;
-  remainingFlags = remainingMines;
-  gameOver = false;
-  REMAINING_FLAGS_ELEMENT.textContent = remainingFlags;
-
-  createBoard();
-}
-
-function checkWin(rows, columns) {
+/**
+ * Checks if the player has won the game.
+ * Returns true if all non-mine cells have been revealed and all flags are correctly placed on mine cells.
+ *
+ * @returns {boolean} True if the player has won, false otherwise.
+ */
+function checkWin() {
   return (
     totalCellsRevealed === rows * columns - remainingMines &&
     correctFlagsCount === remainingMines
   );
+}
+
+/**
+ * Resets the game by resetting the game variables and creating a new board.
+ */
+function newGame() {
+  gameFinish = false;
+  correctFlagsCount = 0;
+  totalCellsRevealed = 0;
+  remainingMines = currentLevelConfig.mines;
+  remainingFlags = remainingMines;
+  REMAINING_FLAGS_ELEMENT.textContent = remainingFlags;
+
+  createBoard();
 }
 
 document.addEventListener("click", (event) => {
