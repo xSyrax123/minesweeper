@@ -14,15 +14,15 @@
       <h1>Minesweeper</h1>
 
       <div class="level">
-        <button class="btn active" id="beginner">Beginner</button>
-        <button class="btn" id="intermediate">Intermediate</button>
-        <button class="btn" id="advanced">Advanced</button>
-        <button class="btn" id="new-game">New game</button>
+        <button type="button" aria-pressed="true" class="btn active" id="beginner">Beginner</button>
+        <button type="button" aria-pressed="false" class="btn" id="intermediate">Intermediate</button>
+        <button type="button" aria-pressed="false" class="btn" id="advanced">Advanced</button>
+        <button type="button" class="btn" id="new-game">New game</button>
       </div>
 
       <p class="info">🚩 <span id="remaining-flags">10</span></p>
 
-      <table id="board"></table>
+      <table role="grid" id="board"></table>
     </section>
   </body>
 </html>
