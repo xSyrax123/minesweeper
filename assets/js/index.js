@@ -143,8 +143,8 @@ function revealCell(row, col) {
 function revealAdjacentsCells(row, col) {
   const CELL = BOARD.rows[row].cells[col];
 
-  if (CELL.textContent) return;
-
+  if (CELL.classList.value) return;
+  
   CELL.classList.add("zero");
 
   for (let i = row - 1; i <= row + 1; i++) {
