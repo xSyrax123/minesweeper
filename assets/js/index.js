@@ -90,9 +90,8 @@ function countAdjacentMines() {
           for (let j = col - 1; j <= col + 1; j++) {
             const VALID_ROW = i >= 0 && i < rows;
             const VALID_COL = j >= 0 && j < columns;
-	    const CELL_HAS_MINE = boardArray[i][j] === "mine";
 
-            if (VALID_ROW && VALID_COL && CELL_HAS_MINE) {
+            if (VALID_ROW && VALID_COL && boardArray[i][j] === "mine") {
               minesCount++;
             }
           }
@@ -132,7 +131,6 @@ function revealCell(row, col) {
   if (checkWin()) {
     gameFinish = true;
     alert("You win!");
-    return;
   }
 }
 
@@ -235,7 +233,6 @@ function addFlagToCell(cell) {
   if (checkWin()) {
     gameFinish = true;
     alert("You win!");
-    return;
   }
 }
 
@@ -291,4 +288,3 @@ document.addEventListener("contextmenu", (event) => {
 });
 
 createBoard();
-
