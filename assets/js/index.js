@@ -90,8 +90,9 @@ function countAdjacentMines() {
           for (let j = col - 1; j <= col + 1; j++) {
             const VALID_ROW = i >= 0 && i < rows;
             const VALID_COL = j >= 0 && j < columns;
+	    const CELL_HAS_MINE = boardArray[i][j] === "mine";
 
-            if (VALID_ROW && VALID_COL && boardArray[i][j] === "mine") {
+            if (VALID_ROW && VALID_COL && CELL_HAS_MINE) {
               minesCount++;
             }
           }
@@ -152,8 +153,9 @@ function revealAdjacentsCells(row, col) {
     for (let j = col - 1; j <= col + 1; j++) {
       const VALID_ROW = i >= 0 && i < rows;
       const VALID_COL = j >= 0 && j < columns;
+      const IS_CURRENT_CELL = i === row && j === col;
 
-      if (VALID_ROW && VALID_COL && !(i === row && j === col)) {
+      if (VALID_ROW && VALID_COL && !IS_CURRENT_CELL) {
         const CELL = BOARD.rows[i].cells[j];
         if (!CELL.classList.value) revealCell(i, j);
       }
@@ -289,3 +291,4 @@ document.addEventListener("contextmenu", (event) => {
 });
 
 createBoard();
+
