@@ -271,12 +271,9 @@ document.addEventListener("click", (event) => {
     const ROW = TARGET.parentNode.rowIndex;
     const COL = TARGET.cellIndex;
     revealCell(ROW, COL);
-  } else if (TARGET === LEVEL_BUTTONS["beginner"]) {
-    changeLevel("beginner");
-  } else if (TARGET === LEVEL_BUTTONS["intermediate"]) {
-    changeLevel("intermediate");
-  } else if (TARGET === LEVEL_BUTTONS["advanced"]) {
-    changeLevel("advanced");
+  } else if (TARGET.hasAttribute("data-level")) {
+    const LEVEL = TARGET.getAttribute("data-level");
+    changeLevel(LEVEL);
   } else if (TARGET === NEW_GAME_BUTTON) {
     newGame();
   }
