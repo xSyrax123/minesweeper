@@ -112,7 +112,7 @@ function countAdjacentMines() {
 function revealCell(row, col) {
   const CELL = BOARD.rows[row].cells[col];
 
-  if (CELL.classList.contains("flag") || CELL.textContent || gameFinish) return;
+  if (CELL.classList.value || gameFinish) return;
 
   if (boardArray[row][col] === "mine") {
     gameFinish = true;
