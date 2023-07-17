@@ -38,10 +38,12 @@ function createBoard() {
   for (let i = 0; i < rows; i++) {
     const ROW = document.createElement("tr");
     boardArray[i] = [];
+    ROW.setAttribute("role", "row")
 
     for (let j = 0; j < columns; j++) {
       const CELL = document.createElement("td");
       boardArray[i][j] = 0;
+      CELL.setAttribute("role", "gridcell")
       ROW.appendChild(CELL);
     }
 
@@ -181,26 +183,8 @@ function revealMines() {
  * @returns {string} The CSS class name for the number.
  */
 function getNumberClass(number) {
-  switch (number) {
-    case 1:
-      return "one";
-    case 2:
-      return "two";
-    case 3:
-      return "three";
-    case 4:
-      return "four";
-    case 5:
-      return "five";
-    case 6:
-      return "six";
-    case 7:
-      return "seven";
-    case 8:
-      return "eight";
-    default:
-      return "";
-  }
+  const CLASSES = ["one", "two", "three", "four", "five", "six", "seven", "eight"];
+  return CLASSES[number - 1];
 }
 
 /**
@@ -213,8 +197,10 @@ function changeLevel(level) {
 
   gameFinish = false;
   LEVEL_BUTTONS[currentLevel].classList.remove("active");
+  LEVEL_BUTTONS[currentLevel].setAttribute("aria-pressed", "false");
   currentLevel = level;
   LEVEL_BUTTONS[currentLevel].classList.add("active");
+  LEVEL_BUTTONS[currentLevel].setAttribute("aria-pressed", "true");
 
   currentLevelConfig = LEVEL_SETTINGS[currentLevel];
   rows = currentLevelConfig.rows;
