@@ -141,11 +141,11 @@ function revealCell(row, col) {
  * @param {number} col - The column index of the cell.
  */
 function revealAdjacentsCells(row, col) {
-  const CELL = BOARD.rows[row].cells[col];
+  const EMPTY_CELL_CLICKED = BOARD.rows[row].cells[col];
 
-  if (CELL.classList.value) return;
-  
-  CELL.classList.add("zero");
+  if (EMPTY_CELL_CLICKED.classList.value) return;
+
+  EMPTY_CELL_CLICKED.classList.add("zero");
 
   for (let i = row - 1; i <= row + 1; i++) {
     for (let j = col - 1; j <= col + 1; j++) {
