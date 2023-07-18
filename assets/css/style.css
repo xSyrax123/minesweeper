@@ -65,46 +65,46 @@ td {
   background-size: cover;
 }
 
-.zero {
+.cell-0 {
   background-color: #eeeeee;
 }
 
-.one {
+.cell-1 {
   background-color: #eeeeee;
   color: #0332fe;
 }
 
-.two {
+.cell-2 {
   background-color: #eeeeee;
   color: #019f02;
 }
 
-.three {
+.cell-3 {
   background-color: #eeeeee;
   color: #ff2600;
 }
 
-.four {
+.cell-4 {
   background-color: #eeeeee;
   color: #93208f;
 }
 
-.five {
+.cell-5 {
   background-color: #eeeeee;
   color: #ff7f29;
 }
 
-.six {
+.cell-6 {
   background-color: #eeeeee;
   color: #ff3fff;
 }
 
-.seven {
+.cell-7 {
   background-color: #eeeeee;
   color: #53b8b4;
 }
 
-.eight {
+.cell-8 {
   background-color: #eeeeee;
   color: #22ee0f;
 }
