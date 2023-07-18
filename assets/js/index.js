@@ -121,9 +121,8 @@ function revealCell(row, col) {
   } else if (boardArray[row][col] === 0) {
     revealAdjacentsCells(row, col);
   } else {
-    const NUMBER_CLASS = getNumberClass(boardArray[row][col]);
     CELL.textContent = boardArray[row][col];
-    CELL.classList.add(NUMBER_CLASS);
+    CELL.classList.add(`cell-${boardArray[row][col]}`);
   }
 
   totalCellsRevealed++;
@@ -145,7 +144,7 @@ function revealAdjacentsCells(row, col) {
 
   if (EMPTY_CELL_CLICKED.classList.value) return;
 
-  EMPTY_CELL_CLICKED.classList.add("zero");
+  EMPTY_CELL_CLICKED.classList.add("cell-0");
 
   for (let i = row - 1; i <= row + 1; i++) {
     for (let j = col - 1; j <= col + 1; j++) {
@@ -174,17 +173,6 @@ function revealMines() {
       }
     }
   }
-}
-
-/**
- * Returns the CSS class name for a given number.
- *
- * @param {number} number - The number of adjacent mines.
- * @returns {string} The CSS class name for the number.
- */
-function getNumberClass(number) {
-  const CLASSES = ["one", "two", "three", "four", "five", "six", "seven", "eight"];
-  return CLASSES[number - 1];
 }
 
 /**
